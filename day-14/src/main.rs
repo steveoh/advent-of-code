@@ -49,6 +49,13 @@ impl Robot {
     }
 }
 
+fn part_two() {
+    // iterate all robots until they are in the same space
+    // calculate the lower common multiple of the seconds
+    // for loop from 0 to lcm and get the first empty space
+    // flood fill the space to get a count of empty spaces
+    // hope the tree is in the iteration with the least empty spaces
+}
 fn main() {
     // p=0,4 v=3,-3
     let robot_regex: Regex =
