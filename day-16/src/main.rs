@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -117,12 +118,14 @@ fn create_maze(input: &str) -> (HashSet<Position>, Position, Position) {
         );
 }
 
-fn dijkstra(maze: &HashSet<Position>, start: Position, end: Position) -> usize {
+fn dijkstra(maze: &HashSet<Position>, start: Position, end: Position) -> (usize, usize) {
     let progress = Progress::new(start, Direction::East, 0, vec![start]);
     let mut visited: HashMap<(Position, Direction), usize> = HashMap::new();
     let mut directions = BinaryHeap::new();
     directions.push(progress);
     visited.insert((start, Direction::East), 0);
+    let mut best = usize::MAX;
+    let mut paths = Vec::new();
 
     while let Some(Progress {
         position,
@@ -139,8 +142,10 @@ fn dijkstra(maze: &HashSet<Position>, start: Position, end: Position) -> usize {
             visited.insert((position, direction), score);
         }
 
-        if position == end {
-            return score;
+        if position == end && best >= score {
+            best = score;
+            paths.push(path.clone());
+            continue;
         }
 
         for neighbor in direction
@@ -156,7 +161,7 @@ fn dijkstra(maze: &HashSet<Position>, start: Position, end: Position) -> usize {
             directions.push(Progress::new(neighbor.0, neighbor.1, score, path));
         }
     }
-    0
+    (best, paths.iter().flatten().unique().count())
 }
 
 fn main() {
@@ -164,5 +169,6 @@ fn main() {
 
     let now = std::time::Instant::now();
     let score = dijkstra(&maze, start, end);
-    println!("Score: {} Elapsed: {:?}", score, now.elapsed());
+    println!("Score: {} Elapsed: {:?}", score.0, now.elapsed());
+    println!("Score: {} Elapsed: {:?}", score.1, now.elapsed());
 }
